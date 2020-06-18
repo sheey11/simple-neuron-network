@@ -7,12 +7,13 @@ class Layer:
     activation = None
     d_activation = None
 
-    # this layer to next layer
+    # previous layer to this layer
     weight = None
 
     # this layer
     bias = None
 
+    # is output layer
     is_output = False
 
     last_input_arr = None
