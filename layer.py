@@ -42,17 +42,17 @@ class Layer:
         return self.weight.T @ delta * self.d_activation(self.last_input_arr)
 
     # batch error backward propagation
-    def layer_error(self, delta_or_t, learning_rate):
+    def layer_error(self, delta_or_t):
         if self.is_output:
             delta_or_t = self.last_output_arr - delta_or_t
-        self.delta_bias += learning_rate * delta_or_t
-        self.delta_weight += learning_rate * delta_or_t @ self.last_input_arr.T
+        self.delta_bias += delta_or_t
+        self.delta_weight += delta_or_t @ self.last_input_arr.T
         return self.previous_layer_error(delta_or_t)
 
     # batch gradient descent
-    def correction(self):
-        self.bias -= self.delta_bias
-        self.weight -= self.delta_weight
+    def correction(self, learning_rate):
+        self.bias -= self.delta_bias * learning_rate
+        self.weight -= self.delta_weight * learning_rate
 
         # reset gradient
         self.delta_weight = np.zeros((self.neurons, self.previous_layer_neurons), dtype=float)
