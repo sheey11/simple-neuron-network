@@ -31,8 +31,8 @@ class Layer:
         self.previous_layer_neurons = previous_layer_neurons
 
         self.neurons = neurons
-        self.weight = np.random.random(size=(neurons, previous_layer_neurons))
-        self.bias = np.random.random(size=(neurons, 1))
+        self.weight = np.random.randn(neurons, previous_layer_neurons)
+        self.bias = np.random.randn(neurons, 1)
 
         self.delta_weight = np.zeros((neurons, previous_layer_neurons), dtype=float)
         self.delta_bias = np.zeros((neurons, 1), dtype=float)
@@ -45,16 +45,16 @@ class Layer:
     def layer_error(self, delta_or_t, learning_rate):
         if self.is_output:
             delta_or_t = self.last_output_arr - delta_or_t
-        else:
-            self.delta_bias += learning_rate * delta_or_t
-            self.delta_weight += learning_rate * delta_or_t @ self.last_input_arr.T
+        self.delta_bias += learning_rate * delta_or_t
+        self.delta_weight += learning_rate * delta_or_t @ self.last_input_arr.T
         return self.previous_layer_error(delta_or_t)
 
     # batch gradient descent
-    def correction(self, m):
-        self.bias -= self.delta_bias / m
-        self.weight -= self.delta_weight / m
+    def correction(self):
+        self.bias -= self.delta_bias
+        self.weight -= self.delta_weight
 
+        # reset gradient
         self.delta_weight = np.zeros((self.neurons, self.previous_layer_neurons), dtype=float)
         self.delta_bias = np.zeros((self.neurons, 1), dtype=float)
 
@@ -67,6 +67,15 @@ class Layer:
         self.last_input_arr = a
         self.last_output_arr = r
         return r
+    
+    def test(self, a):
+        z = self.weight @ a + self.bias
+        z = self.activation(z)
+        if(self.is_output):
+            if z[0][0] > z[1][0]:
+                return 0
+            return 1
+        return z
 
     @classmethod
     def sigmoid(cls, x):
